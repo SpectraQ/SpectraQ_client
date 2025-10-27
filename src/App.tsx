@@ -7,18 +7,92 @@ import SignupPage from "./pages/auth/signupPage";
 import EmailVerifyPage from "./pages/auth/emailVerifyPage";
 import ResetPasswordPage from "./pages/auth/resetPasswordPage";
 import ForgotPasswordPage from "./pages/auth/forgotPasswordPage";
+import CheckAuth from "./components/auth/checkAuth";
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/verify-email" element={<EmailVerifyPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password/:id" element={<ResetPasswordPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/"
+          element={
+            <CheckAuth>
+              <Home />
+            </CheckAuth>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <CheckAuth>
+              <SignupPage />
+            </CheckAuth>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <CheckAuth>
+              <LoginPage />
+            </CheckAuth>
+          }
+        />
+        <Route
+          path="/verify-email"
+          element={
+            <CheckAuth>
+              <EmailVerifyPage />
+            </CheckAuth>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <CheckAuth>
+              <ForgotPasswordPage />
+            </CheckAuth>
+          }
+        />
+        <Route
+          path="/reset-password/:token"
+          element={
+            <CheckAuth>
+              <ResetPasswordPage />
+            </CheckAuth>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <CheckAuth>
+              <Dashboard />
+            </CheckAuth>
+          }
+        />
+        <Route
+          path="/communities"
+          element={
+            <CheckAuth>
+              <Dashboard />
+            </CheckAuth>
+          }
+        />
+        <Route
+          path="/markets"
+          element={
+            <CheckAuth>
+              <Dashboard />
+            </CheckAuth>
+          }
+        />
+        <Route
+          path="/portfolio"
+          element={
+            <CheckAuth>
+              <Dashboard />
+            </CheckAuth>
+          }
+        />
       </Routes>
     </>
   );

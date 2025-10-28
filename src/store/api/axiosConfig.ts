@@ -15,18 +15,18 @@ export const setAuthToken = (token: string | null) => {
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
     try {
-      localStorage.setItem("auth_token", token);
+      localStorage.setItem("token", token);
     } catch (e) {}
   } else {
     delete api.defaults.headers.common["Authorization"];
     try {
-      localStorage.removeItem("auth_token");
+      localStorage.removeItem("token");
     } catch (e) {}
   }
 };
 
 try {
-  const storedToken = localStorage.getItem("auth_token");
+  const storedToken = localStorage.getItem("token");
   if (storedToken) setAuthToken(storedToken);
 } catch (e) {}
 

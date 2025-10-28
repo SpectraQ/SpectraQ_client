@@ -20,8 +20,7 @@ interface AuthState {
 
 const initialState: AuthState = {
   user: null,
-  token:
-    typeof window !== "undefined" ? localStorage.getItem("auth_token") : null,
+  token: typeof window !== "undefined" ? localStorage.getItem("token") : null,
   loading: false,
   error: null,
   message: null,
@@ -203,8 +202,8 @@ const authSlice = createSlice({
       state.message = null;
       setAuthToken(null);
       try {
-        localStorage.removeItem("auth_user");
-        localStorage.removeItem("auth_token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
       } catch (e) {
         // ignore
       }
@@ -224,8 +223,8 @@ const authSlice = createSlice({
       state.token = action.payload.token;
       setAuthToken(action.payload.token);
       try {
-        localStorage.setItem("auth_user", JSON.stringify(action.payload.user));
-        localStorage.setItem("auth_token", action.payload.token);
+        localStorage.setItem("user", JSON.stringify(action.payload.user));
+        localStorage.setItem("token", action.payload.token);
       } catch (e) {
         // ignore
       }
@@ -265,8 +264,8 @@ const authSlice = createSlice({
           // persist
           setAuthToken(payload.token);
           try {
-            localStorage.setItem("auth_user", JSON.stringify(payload.user));
-            localStorage.setItem("auth_token", payload.token);
+            localStorage.setItem("user", JSON.stringify(payload.user));
+            localStorage.setItem("token", payload.token);
           } catch (e) {
             // ignore
           }

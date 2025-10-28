@@ -11,8 +11,20 @@ import CheckAuth from "./components/auth/checkAuth";
 import CommunitiesPage from "./pages/home/communities";
 import CommunityInfo from "./components/home/communities/communityInfo";
 import DashboardPage from "./pages/home/dashboard";
+import { useEffect } from "react";
+import useAuth from "./hooks/useAuth";
+import { setAuthToken } from "./store/api/axiosConfig";
 
 function App() {
+  const auth = useAuth();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setAuthToken(null);
+    }
+  }, [auth]);
+
   return (
     <>
       <Routes>

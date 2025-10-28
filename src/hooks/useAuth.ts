@@ -83,7 +83,7 @@ export function useAuth() {
 
   const validateAuthToken = useCallback(
     (opts?: { token?: string }) => {
-      // if token supplied, ensure axios header is set
+      
       if (opts?.token) setAuthToken(opts.token);
       return dispatch(validateToken(opts ?? undefined));
     },

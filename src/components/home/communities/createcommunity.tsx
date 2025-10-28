@@ -26,6 +26,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+import Swal from "sweetalert2";
+
 const COMMUNITY_ICONS = [
   "📈",
   "🎮",
@@ -96,6 +98,8 @@ export const CreateCommunity = () => {
   const [open, setOpen] = useState(false);
   const [categoryPopoverOpen, setCategoryPopoverOpen] = useState(false);
   const [customCategory, setCustomCategory] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -142,26 +146,104 @@ export const CreateCommunity = () => {
     return isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
-    // Here you would typically call an API to create the community
-    console.log("Creating community:", formData);
+    setApiError(null);
+    setLoading(true);
 
-    // Reset form and close dialog
-    setFormData({
-      name: "",
-      description: "",
-      icon: "📈",
-      color: "text-green-400",
-      categories: [],
-    });
-    setErrors({ name: "", description: "", categories: "" });
-    setOpen(false);
+    try {
+      const rawUser = localStorage.getItem("user");
+      const token = localStorage.getItem("token");
+
+      if (!rawUser) {
+        throw new Error("User not found in localStorage. Please login.");
+      }
+
+      const user = JSON.parse(rawUser);
+      const ownerId = user?.id;
+      if (!ownerId) throw new Error("Invalid user data. Missing id.");
+
+      const payload = {
+        name: formData.name,
+        description: formData.description,
+        ownerId,
+        icon: formData.icon,
+        categories: formData.categories,
+      };
+
+      const baseUrl = import.meta.env.VITE_URL_COMMUNITY;
+      if (!baseUrl) throw new Error("Server URL not configured");
+
+      const res = await fetch(`${baseUrl.replace(/\/$/, "")}/communities`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => null);
+        const message =
+          errBody?.message ||
+          errBody?.error ||
+          `Failed to create community (${res.status})`;
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: message,
+          timer: 3000,
+          showConfirmButton: true,
+          theme: "dark",
+        });
+        throw new Error(message);
+      }
+
+      const data = await res.json().catch(() => ({} as any));
+      if (res.status >= 200 && res.status < 300) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Community created successfully",
+          timer: 2000,
+          showConfirmButton: false,
+          theme: "dark",
+        });
+      }
+
+      console.log("Community created:", data);
+
+      setFormData({
+        name: "",
+        description: "",
+        icon: "📈",
+        color: "text-green-400",
+        categories: [],
+      });
+      setErrors({ name: "", description: "", categories: "" });
+      setOpen(false);
+    } catch (err: any) {
+      console.error("Create community error:", err);
+      const message = err?.message || "Failed to create community";
+      setApiError(message);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: message,
+        timer: 3000,
+        showConfirmButton: true,
+        theme: "dark",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const addCategory = (category: string) => {
@@ -416,10 +498,16 @@ export const CreateCommunity = () => {
             </Card>
           </div>
 
+          {apiError && <p className="text-sm text-red-500">{apiError}</p>}
+
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
-            <Button type="submit" className="btn-quantum flex-1">
-              Create Community
+            <Button
+              type="submit"
+              className="btn-quantum flex-1"
+              disabled={loading}
+            >
+              {loading ? "Creating..." : "Create Community"}
             </Button>
             <Button
               type="button"
@@ -435,7 +523,9 @@ export const CreateCommunity = () => {
                   categories: [],
                 });
                 setErrors({ name: "", description: "", categories: "" });
+                setApiError(null);
               }}
+              disabled={loading}
             >
               Cancel
             </Button>

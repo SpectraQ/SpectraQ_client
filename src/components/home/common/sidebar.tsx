@@ -35,7 +35,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   // Parse user from localStorage
   const getUserFromStorage = (): AuthUser | null => {
     try {
-      const userString = localStorage.getItem("auth_user");
+      const userString = localStorage.getItem("user");
       if (!userString) return null;
       return JSON.parse(userString) as AuthUser;
     } catch (error) {
@@ -49,8 +49,8 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const handleLogout = async () => {
     try {
       // Clear localStorage
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("auth_user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
 
       // Call logout from useAuth hook to update state
       if (logout) {

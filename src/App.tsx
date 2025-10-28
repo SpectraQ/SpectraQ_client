@@ -8,6 +8,9 @@ import EmailVerifyPage from "./pages/auth/emailVerifyPage";
 import ResetPasswordPage from "./pages/auth/resetPasswordPage";
 import ForgotPasswordPage from "./pages/auth/forgotPasswordPage";
 import CheckAuth from "./components/auth/checkAuth";
+import CommunitiesPage from "./pages/home/communities";
+import CommunityInfo from "./components/home/communities/communityInfo";
+import DashboardPage from "./pages/home/dashboard";
 
 function App() {
   return (
@@ -65,7 +68,7 @@ function App() {
           path="/dashboard"
           element={
             <CheckAuth>
-              <Dashboard />
+              <DashboardPage />
             </CheckAuth>
           }
         />
@@ -73,7 +76,15 @@ function App() {
           path="/communities"
           element={
             <CheckAuth>
-              <Dashboard />
+              <CommunitiesPage />
+            </CheckAuth>
+          }
+        />
+        <Route
+          path="/communities/:communityName"
+          element={
+            <CheckAuth>
+              <CommunityInfo />
             </CheckAuth>
           }
         />

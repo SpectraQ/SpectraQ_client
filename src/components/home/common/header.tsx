@@ -11,6 +11,7 @@ function Header() {
     if (path === "/communities") return "Communities";
     if (path === "/markets") return "Markets";
     if (path === "/portfolio") return "Portfolio";
+    if (path.startsWith("/communities/")) return "Community";
 
     // Fallback: capitalize the path segment
     const segment = path.split("/")[1];
@@ -20,7 +21,7 @@ function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full flex justify-between items-center border-b border-gray-800 bg-background px-6 py-5">
+    <header className="sticky top-0 md:top-0 z-20 w-full md:w-auto flex justify-between items-center border-b border-gray-800 bg-background px-6 py-5">
       <div className="text-xl font-bold">{getPageTitle()}</div>
       <Button className="btn-quantum">Connect wallet</Button>
     </header>

@@ -17,17 +17,45 @@ interface DashboardLayoutProps {
   children: ReactNode;
 }
 
+interface AuthUser {
+  id: string;
+  email: string;
+  role: string;
+  username: string;
+  verified: boolean;
+}
+
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Parse user from localStorage
+  const getUserFromStorage = (): AuthUser | null => {
+    try {
+      const userString = localStorage.getItem("auth_user");
+      if (!userString) return null;
+      return JSON.parse(userString) as AuthUser;
+    } catch (error) {
+      console.error("Error parsing user from localStorage:", error);
+      return null;
+    }
+  };
+
+  const user = getUserFromStorage();
+
   const handleLogout = () => {
     localStorage.removeItem("auth_token");
+    localStorage.removeItem("auth_user");
     navigate("/");
   };
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    if (path === "/communities") {
+      return location.pathname === path;
+    }
+    return location.pathname.startsWith(path);
+  };
 
   const navItems = [
     { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -72,8 +100,12 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               onClick={() => setSidebarOpen(false)}
             >
               <Button
-                variant={isActive(item.path) ? "secondary" : "ghost"}
-                className="w-full justify-start gap-3"
+                variant="ghost"
+                className={`w-full justify-start gap-3 transition-colors ${
+                  isActive(item.path)
+                    ? "bg-quantum-red text-white hover:from-red-700 hover:to-pink-700"
+                    : "hover:bg-muted"
+                }`}
               >
                 <item.icon className="h-5 w-5" />
                 {item.label}
@@ -85,14 +117,19 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         {/* Sidebar Footer */}
         <div className="absolute bottom-0 left-0 right-0 w-64 p-4 border-t border-gray-800 text-left bg-background">
           <div className="mb-3 px-3">
-            <div className="font-medium text-sm">Name</div>
-            <div className="text-xs text-muted-foreground">
-              email@example.com
+            <div className="font-medium text-sm">
+              {user?.username || "Guest"}
+            </div>
+            <div
+              className="text-xs text-muted-foreground truncate"
+              title={user?.email}
+            >
+              {user?.email || "No email"}
             </div>
           </div>
           <Button
             variant="ghost"
-            className="w-full justify-start gap-3"
+            className="w-full justify-start gap-3 hover:bg-red-500/10 hover:text-red-500 transition-colors"
             onClick={handleLogout}
           >
             <LogOut className="h-5 w-5" />
@@ -111,20 +148,22 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col md:ml-64">
-        {/* Mobile Header with Menu */}
-        <div className="md:hidden sticky top-0 z-30 flex items-center justify-between border-b border-gray-800 bg-background/80 backdrop-blur px-4 py-3">
+        {/* Mobile Header with Menu - Fixed positioning */}
+        <div className="md:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between border-b border-gray-800 bg-background px-4 py-3">
           <button
-            className="text-foreground hover:text-muted-foreground"
+            className="text-foreground hover:text-muted-foreground p-2"
             onClick={() => setSidebarOpen(true)}
           >
-            <Menu className="h-5 w-5 cursor-pointer" />
+            <Menu className="h-6 w-6" />
           </button>
           <h1 className="text-lg font-semibold">SpectraQ</h1>
-          <div className="w-5" />
+          <div className="w-10" />
         </div>
 
-        {/* Fixed Header */}
-        <Header />
+        {/* Fixed Header - below mobile menu */}
+        <div className="mt-[57px] md:mt-0">
+          <Header />
+        </div>
 
         {/* Main Scrollable Content */}
         <main className="flex-1 overflow-auto p-6 bg-background">

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import logo from "@/assets/logo.jpg";
 import Header from "./header";
+import useAuth from "@/hooks/useAuth";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -29,6 +30,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { logout } = useAuth();
 
   // Parse user from localStorage
   const getUserFromStorage = (): AuthUser | null => {
@@ -44,10 +46,24 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   const user = getUserFromStorage();
 
-  const handleLogout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("auth_user");
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      // Clear localStorage
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("auth_user");
+
+      // Call logout from useAuth hook to update state
+      if (logout) {
+        await logout();
+      }
+
+      // Navigate to login
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Force navigation even if logout fails
+      navigate("/login", { replace: true });
+    }
   };
 
   const isActive = (path: string) => {

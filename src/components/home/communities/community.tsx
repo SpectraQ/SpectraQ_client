@@ -7,7 +7,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import axios from "axios";
 import {
   Search,
   Users,
@@ -23,230 +24,220 @@ interface Community {
   id: string;
   name: string;
   description: string;
-  icon: string;
-  color: string;
-  members: number;
-  activeMarkets: number;
-  totalVolume: string;
-  category: string;
-  createdAt: string;
+  icon?: string;
+  color?: string;
+  members?: number;
+  activeMarkets?: number;
+  totalVolume?: string;
+  category?: string;
+  categories?: string[];
+  createdAt?: string;
 }
+
+interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+}
+
+const ITEMS_PER_PAGE = 9;
 
 const Communities = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
 
-  // Mock data - replace with API call later
-  const mockCommunities: Community[] = [
-    {
-      id: "1",
-      name: "Crypto Traders",
-      description: "Predict cryptocurrency prices and market movements",
-      icon: "₿",
-      color: "text-orange-500",
-      members: 12847,
-      activeMarkets: 45,
-      totalVolume: "$2.4M",
-      category: "Finance",
-      createdAt: "2024-01-15",
-    },
-    {
-      id: "2",
-      name: "Esports Arena",
-      description: "Bet on your favorite esports teams and tournaments",
-      icon: "🎮",
-      color: "text-purple-500",
-      members: 8932,
-      activeMarkets: 32,
-      totalVolume: "$1.2M",
-      category: "Gaming",
-      createdAt: "2024-02-20",
-    },
-    {
-      id: "3",
-      name: "Stock Market Pros",
-      description: "Traditional markets and stock predictions",
-      icon: "📈",
-      color: "text-green-500",
-      members: 15234,
-      activeMarkets: 67,
-      totalVolume: "$3.8M",
-      category: "Finance",
-      createdAt: "2024-01-10",
-    },
-    {
-      id: "4",
-      name: "Political Forecasters",
-      description: "Predict election outcomes and political events",
-      icon: "🗳️",
-      color: "text-blue-500",
-      members: 6543,
-      activeMarkets: 28,
-      totalVolume: "$890K",
-      category: "Politics",
-      createdAt: "2024-03-05",
-    },
-    {
-      id: "5",
-      name: "Sports Betting Hub",
-      description: "Predictions on football, basketball, and more",
-      icon: "⚽",
-      color: "text-red-500",
-      members: 18234,
-      activeMarkets: 89,
-      totalVolume: "$4.2M",
-      category: "Sports",
-      createdAt: "2024-01-20",
-    },
-    {
-      id: "6",
-      name: "Tech Innovators",
-      description: "Predict tech product launches and startup success",
-      icon: "💻",
-      color: "text-cyan-500",
-      members: 5621,
-      activeMarkets: 21,
-      totalVolume: "$650K",
-      category: "Technology",
-      createdAt: "2024-04-12",
-    },
-    {
-      id: "7",
-      name: "Weather Watchers",
-      description: "Climate predictions and weather event forecasts",
-      icon: "🌦️",
-      color: "text-sky-500",
-      members: 3421,
-      activeMarkets: 15,
-      totalVolume: "$320K",
-      category: "Science",
-      createdAt: "2024-05-01",
-    },
-    {
-      id: "8",
-      name: "Entertainment Buzz",
-      description: "Movie box office, award shows, and celebrity news",
-      icon: "🎬",
-      color: "text-pink-500",
-      members: 9876,
-      activeMarkets: 34,
-      totalVolume: "$1.1M",
-      category: "Entertainment",
-      createdAt: "2024-02-28",
-    },
-    {
-      id: "9",
-      name: "DeFi Enthusiasts",
-      description: "Decentralized finance protocols and token predictions",
-      icon: "🔗",
-      color: "text-indigo-500",
-      members: 7234,
-      activeMarkets: 41,
-      totalVolume: "$1.6M",
-      category: "Finance",
-      createdAt: "2024-03-15",
-    },
-    {
-      id: "10",
-      name: "Real Estate Insights",
-      description: "Property market trends and housing predictions",
-      icon: "🏠",
-      color: "text-yellow-500",
-      members: 4532,
-      activeMarkets: 18,
-      totalVolume: "$780K",
-      category: "Real Estate",
-      createdAt: "2024-04-20",
-    },
-    {
-      id: "11",
-      name: "Music Charts",
-      description: "Predict chart positions and music award winners",
-      icon: "🎵",
-      color: "text-fuchsia-500",
-      members: 6234,
-      activeMarkets: 24,
-      totalVolume: "$540K",
-      category: "Entertainment",
-      createdAt: "2024-05-10",
-    },
-    {
-      id: "12",
-      name: "Space Explorers",
-      description: "Space missions, launches, and astronomical events",
-      icon: "🚀",
-      color: "text-violet-500",
-      members: 4123,
-      activeMarkets: 12,
-      totalVolume: "$380K",
-      category: "Science",
-      createdAt: "2024-06-01",
-    },
-  ];
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
 
-  const filteredCommunities = mockCommunities.filter(
-    (community) =>
-      community.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      community.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      community.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [communities, setCommunities] = useState<Community[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
-  const totalPages = Math.ceil(filteredCommunities.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedCommunities = filteredCommunities.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const handleViewCommunity = (communityName: string) => {
-    const formattedName = communityName.toLowerCase().replace(/\s+/g, "-");
-    navigate(`/communities/${formattedName}`);
+  // Fetch one page from server (server-side pagination)
+  useEffect(() => {
+    let mounted = true;
+    const fetchPage = async () => {
+      setLoading(true);
+      setApiError(null);
+      try {
+        const baseUrl = import.meta.env.VITE_URL_COMMUNITY;
+        if (!baseUrl) throw new Error("VITE_URL_COMMUNITY is not configured");
+
+        const token = localStorage.getItem("token") || undefined;
+
+        const res = await axios.get<PaginatedResponse<Community>>(
+          `${baseUrl.replace(/\/$/, "")}/communities`,
+          {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            params: { page, limit: ITEMS_PER_PAGE },
+          }
+        );
+
+        if (!mounted) return;
+
+        const payload = res.data;
+        const data = Array.isArray(payload?.data) ? payload.data : [];
+
+        // normalize fields and safe defaults
+        const normalized = data.map((c) => ({
+          id: c.id,
+          name: c.name,
+          description: c.description,
+          icon: c.icon ?? "📈",
+          color: c.color ?? "text-green-400",
+          members: c.members ?? 0,
+          activeMarkets: c.activeMarkets ?? 0,
+          totalVolume: c.totalVolume ?? "$0",
+          categories: c.categories ?? [],
+          category:
+            (c.categories && c.categories.length > 0 && c.categories[0]) ||
+            c.category ||
+            "General",
+          createdAt: c.createdAt ?? "",
+        }));
+
+        setCommunities(normalized);
+
+        if (payload?.pagination) {
+          setTotalPages(payload.pagination.totalPages || 1);
+          setTotalItems(payload.pagination.totalItems || normalized.length);
+          setPage(payload.pagination.currentPage || page);
+        } else {
+          setTotalPages(
+            Math.max(1, Math.ceil(normalized.length / ITEMS_PER_PAGE))
+          );
+          setTotalItems(normalized.length);
+        }
+      } catch (err: any) {
+        console.error("Failed to fetch communities", err);
+        setApiError(
+          err?.response?.data?.message ||
+            err?.response?.data?.error ||
+            err?.message ||
+            "Failed to load communities"
+        );
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    fetchPage();
+    return () => {
+      mounted = false;
+    };
+  }, [page]);
+
+  // derive available categories (unique across the fetched page)
+  const availableCategories = useMemo(() => {
+    const set = new Set<string>();
+    communities.forEach((c) => {
+      (c.categories || []).forEach((cat) => set.add(cat));
+    });
+    return Array.from(set).sort();
+  }, [communities]);
+
+  // client-side filtering (no extra API calls)
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let list = communities;
+    if (activeCategory) {
+      list = list.filter((c) => (c.categories || []).includes(activeCategory));
+    }
+    if (q) {
+      list = list.filter(
+        (c) =>
+          c.name.toLowerCase().includes(q) ||
+          c.description.toLowerCase().includes(q) ||
+          (c.category || "").toLowerCase().includes(q) ||
+          (c.categories || []).some((cat) => cat.toLowerCase().includes(q))
+      );
+    }
+    return list;
+  }, [communities, query, activeCategory]);
+
+  const startIndex = 0; // server returned page already; we display items as-is (or throttle if you want client paging)
+  const paginated = filtered.slice(startIndex, ITEMS_PER_PAGE);
+
+  const handleViewCommunity = (community: Community) => {
+    // store selected community for CommunityInfo to read (persist across refresh)
+    try {
+      localStorage.setItem("selectedCommunity", JSON.stringify(community));
+    } catch {
+      // ignore localStorage errors
+    }
+    // also pass via navigate state for immediate access
+    const formattedName = community.name.toLowerCase().replace(/\s+/g, "-");
+    navigate(`/communities/${formattedName}`, { state: community });
   };
 
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4 text-left">
-            <div>
-              <h1 className="text-4xl font-bold text-foreground mb-2">
-                Communities
-              </h1>
-              <p className="text-lg text-muted-foreground">
-                Join specialized communities and participate in prediction
-                markets
-              </p>
-            </div>
-            <CreateCommunity />
+        <div className="mb-6 flex items-center justify-between text-left">
+          <div>
+            <h1 className="text-4xl font-bold text-foreground mb-1">
+              Communities
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Join specialized communities and participate in prediction markets
+            </p>
           </div>
+          <CreateCommunity />
         </div>
 
-        {/* Search */}
-        <div className="mb-8">
-          <div className="relative max-w-md">
+        {/* Controls */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+          <div className="relative max-w-md w-full md:w-1/3">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
               placeholder="Search communities..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
               className="pl-10 bg-card border-border"
             />
+          </div>
+
+          <div className="flex gap-2 items-center">
+            <div className="text-sm text-muted-foreground mr-2 hidden md:block">
+              Categories:
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Badge
+                variant={activeCategory ? "outline" : "default"}
+                className="cursor-pointer"
+                onClick={() => setActiveCategory(null)}
+              >
+                All
+              </Badge>
+              {availableCategories.map((cat) => (
+                <Badge
+                  key={cat}
+                  variant={activeCategory === cat ? "default" : "outline"}
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setActiveCategory((s) => (s === cat ? null : cat))
+                  }
+                >
+                  {cat}
+                </Badge>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-left">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <Card className="gradient-card border-border/50">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -255,21 +246,22 @@ const Communities = () => {
                     Total Communities
                   </p>
                   <p className="text-2xl font-bold text-foreground">
-                    {mockCommunities.length}
+                    {totalItems}
                   </p>
                 </div>
                 <Users className="w-8 h-8 text-primary" />
               </div>
             </CardContent>
           </Card>
+
           <Card className="gradient-card border-border/50">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Total Members</p>
                   <p className="text-2xl font-bold text-foreground">
-                    {mockCommunities
-                      .reduce((acc, c) => acc + c.members, 0)
+                    {filtered
+                      .reduce((acc, c) => acc + (c.members || 0), 0)
                       .toLocaleString()}
                   </p>
                 </div>
@@ -277,6 +269,7 @@ const Communities = () => {
               </div>
             </CardContent>
           </Card>
+
           <Card className="gradient-card border-border/50">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -285,8 +278,8 @@ const Communities = () => {
                     Active Markets
                   </p>
                   <p className="text-2xl font-bold text-foreground">
-                    {mockCommunities.reduce(
-                      (acc, c) => acc + c.activeMarkets,
+                    {filtered.reduce(
+                      (acc, c) => acc + (c.activeMarkets || 0),
                       0
                     )}
                   </p>
@@ -297,8 +290,21 @@ const Communities = () => {
           </Card>
         </div>
 
-        {/* Communities Grid */}
-        {filteredCommunities.length === 0 ? (
+        {/* Loading / Error / Empty */}
+        {loading ? (
+          <Card className="gradient-card border-border/50">
+            <CardContent className="text-center py-12">
+              <div className="text-2xl mb-2">Loading communities…</div>
+            </CardContent>
+          </Card>
+        ) : apiError ? (
+          <Card className="gradient-card border-border/50">
+            <CardContent className="text-center py-12">
+              <div className="text-2xl mb-2">Error</div>
+              <p className="text-sm text-red-400">{apiError}</p>
+            </CardContent>
+          </Card>
+        ) : filtered.length === 0 ? (
           <Card className="gradient-card border-border/50">
             <CardContent className="text-center py-12">
               <div className="text-6xl mb-4">🔍</div>
@@ -306,25 +312,25 @@ const Communities = () => {
                 No communities found
               </h3>
               <p className="text-muted-foreground">
-                Try adjusting your search term
+                Try adjusting your search term or category
               </p>
             </CardContent>
           </Card>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {paginatedCommunities.map((community) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+              {paginated.map((community) => (
                 <Card
                   key={community.id}
-                  className="gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 cursor-pointer group border-gray-700"
+                  className="gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 group"
                 >
                   <CardHeader>
-                    <div className="flex items-start justify-between text-left">
+                    <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <div className="text-4xl">{community.icon}</div>
                         <div>
                           <h3
-                            className={`text-lg font-bold ${community.color} group-hover:text-primary transition-colors`}
+                            className={`text-lg font-bold ${community.color} group-hover:text-primary`}
                           >
                             {community.name}
                           </h3>
@@ -335,6 +341,7 @@ const Communities = () => {
                       </div>
                     </div>
                   </CardHeader>
+
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
                       {community.description}
@@ -343,27 +350,28 @@ const Communities = () => {
                       <div className="bg-muted/20 rounded-lg p-2">
                         <p className="text-xs text-muted-foreground">Members</p>
                         <p className="text-sm font-semibold text-foreground">
-                          {community.members.toLocaleString()}
+                          {(community.members || 0).toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-muted/20 rounded-lg p-2">
                         <p className="text-xs text-muted-foreground">Markets</p>
                         <p className="text-sm font-semibold text-foreground">
-                          {community.activeMarkets}
+                          {community.activeMarkets || 0}
                         </p>
                       </div>
                       <div className="bg-muted/20 rounded-lg p-2">
                         <p className="text-xs text-muted-foreground">Volume</p>
                         <p className="text-sm font-semibold text-green-500">
-                          {community.totalVolume}
+                          {community.totalVolume || "$0"}
                         </p>
                       </div>
                     </div>
                   </CardContent>
+
                   <CardFooter>
                     <Button
                       className="w-full btn-quantum"
-                      onClick={() => handleViewCommunity(community.name)}
+                      onClick={() => handleViewCommunity(community)}
                     >
                       View Community
                     </Button>
@@ -372,40 +380,31 @@ const Communities = () => {
               ))}
             </div>
 
-            {/* Pagination */}
+            {/* Simple Pagination (server controls pages) */}
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-2">
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="btn-outline-quantum"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      onClick={() => handlePageChange(page)}
-                      className={
-                        currentPage === page
-                          ? "btn-quantum"
-                          : "btn-outline-quantum"
-                      }
-                    >
-                      {page}
-                    </Button>
-                  )
-                )}
+
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Page</span>
+                  <strong>{page}</strong>
+                  <span className="text-sm text-muted-foreground">
+                    of {totalPages}
+                  </span>
+                </div>
+
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="btn-outline-quantum"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>

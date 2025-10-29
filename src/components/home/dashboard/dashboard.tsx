@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,7 +9,6 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Users,
@@ -18,10 +20,8 @@ import {
   Activity,
   Award,
   DollarSign,
-  Calendar,
   Target,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 interface JoinedCommunity {
   id: string;
@@ -79,61 +79,58 @@ interface PortfolioStats {
   }[];
 }
 
+const ITEMS_PER_PAGE = 9;
+
 function Dashboard() {
   const navigate = useNavigate();
+
   const [notificationStates, setNotificationStates] = useState<
     Record<string, boolean>
   >({});
+  const [joinedCommunities, setJoinedCommunities] = useState<JoinedCommunity[]>(
+    []
+  );
+  const [loadingCommunities, setLoadingCommunities] = useState(false);
+  const [communitiesError, setCommunitiesError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalUserCommunities, setTotalUserCommunities] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
 
-  // Mock data - replace with API calls
-  const mockJoinedCommunities: JoinedCommunity[] = [
-    {
-      id: "1",
-      name: "Crypto Traders",
-      description: "Predict cryptocurrency prices and market movements",
-      icon: "₿",
-      color: "text-orange-500",
-      members: 12847,
-      activeMarkets: 45,
-      totalVolume: "$2.4M",
-      category: "Finance",
-      joinedAt: "2024-09-15",
-      unreadMessages: 12,
-      isNotificationsEnabled: true,
-      lastActivity: "2 hours ago",
+  // Portfolio & active markets can still use mock data for now
+  const portfolioStats: PortfolioStats = {
+    totalInvested: 1250,
+    currentValue: 1387,
+    totalPnL: 137,
+    totalPnLPercentage: 10.96,
+    activePositions: 8,
+    winRate: 62.5,
+    bestTrade: {
+      market: "Will Bitcoin reach $100k?",
+      pnl: 45,
     },
-    {
-      id: "2",
-      name: "Esports Arena",
-      description: "Bet on your favorite esports teams and tournaments",
-      icon: "🎮",
-      color: "text-purple-500",
-      members: 8932,
-      activeMarkets: 32,
-      totalVolume: "$1.2M",
-      category: "Gaming",
-      joinedAt: "2024-09-20",
-      unreadMessages: 5,
-      isNotificationsEnabled: true,
-      lastActivity: "1 day ago",
-    },
-    {
-      id: "3",
-      name: "DeFi Enthusiasts",
-      description: "Decentralized finance protocols and token predictions",
-      icon: "🔗",
-      color: "text-indigo-500",
-      members: 7234,
-      activeMarkets: 41,
-      totalVolume: "$1.6M",
-      category: "Finance",
-      joinedAt: "2024-10-01",
-      unreadMessages: 0,
-      isNotificationsEnabled: false,
-      lastActivity: "3 days ago",
-    },
-  ];
+    recentActivity: [
+      {
+        date: "2024-10-27",
+        action: "Bought YES",
+        market: "Bitcoin $100k prediction",
+        amount: 50,
+      },
+      {
+        date: "2024-10-26",
+        action: "Sold NO",
+        market: "Team Liquid TI winner",
+        amount: 30,
+      },
+      {
+        date: "2024-10-25",
+        action: "Bought YES",
+        market: "ETH $5k prediction",
+        amount: 75,
+      },
+    ],
+  };
 
+  // Keep a small set of mock active markets for the UI
   const mockActiveMarkets: ActiveMarket[] = [
     {
       id: "1",
@@ -197,49 +194,112 @@ function Dashboard() {
     },
   ];
 
-  const portfolioStats: PortfolioStats = {
-    totalInvested: 1250,
-    currentValue: 1387,
-    totalPnL: 137,
-    totalPnLPercentage: 10.96,
-    activePositions: 8,
-    winRate: 62.5,
-    bestTrade: {
-      market: "Will Bitcoin reach $100k?",
-      pnl: 45,
-    },
-    recentActivity: [
-      {
-        date: "2024-10-27",
-        action: "Bought YES",
-        market: "Bitcoin $100k prediction",
-        amount: 50,
-      },
-      {
-        date: "2024-10-26",
-        action: "Sold NO",
-        market: "Team Liquid TI winner",
-        amount: 30,
-      },
-      {
-        date: "2024-10-25",
-        action: "Bought YES",
-        market: "ETH $5k prediction",
-        amount: 75,
-      },
-    ],
-  };
+  useEffect(() => {
+    // fetch user's communities (paginated)
+    let mounted = true;
+    const fetchMyCommunities = async () => {
+      setLoadingCommunities(true);
+      setCommunitiesError(null);
+
+      try {
+        const baseUrl = import.meta.env.VITE_URL_COMMUNITY;
+        if (!baseUrl) throw new Error("VITE_URL_COMMUNITY is not configured");
+
+        const token = localStorage.getItem("token") || undefined;
+
+        const res = await axios.get(
+          `${baseUrl.replace(/\/$/, "")}/communities/my/list`,
+          {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            params: { page, limit: ITEMS_PER_PAGE },
+          }
+        );
+
+        if (!mounted) return;
+
+        // expect response shape: { data: Community[], pagination: { ... } }
+        const payload = res.data;
+        const data: any[] = Array.isArray(payload?.data) ? payload.data : [];
+
+        // map server community object to JoinedCommunity with safe defaults.
+        const mapped: JoinedCommunity[] = data.map((c: any) => {
+          return {
+            id: c.id,
+            name: c.name,
+            description: c.description || "No description",
+            icon: c.icon || "📈",
+            color: c.color || "text-green-400",
+            // server doesn't return members count in this endpoint — default to 0
+            members: c.members ?? 0,
+            activeMarkets: Array.isArray(c.marketIds) ? c.marketIds.length : 0,
+            totalVolume: c.totalVolume ?? "$0",
+            category: (c.categories && c.categories[0]) || "General",
+            joinedAt: c.createdAt || "",
+            unreadMessages: 0,
+            isNotificationsEnabled: true,
+            lastActivity: "",
+          };
+        });
+
+        setJoinedCommunities(mapped);
+        // initialize notification states for fetched communities if not already set
+        setNotificationStates((prev) => {
+          const next = { ...prev };
+          mapped.forEach((mc) => {
+            if (next[mc.id] === undefined)
+              next[mc.id] = mc.isNotificationsEnabled;
+          });
+          return next;
+        });
+
+        if (payload?.pagination) {
+          setTotalPages(payload.pagination.totalPages || 1);
+          setTotalUserCommunities(
+            payload.pagination.totalItems || mapped.length
+          );
+        } else {
+          setTotalPages(Math.max(1, Math.ceil(mapped.length / ITEMS_PER_PAGE)));
+          setTotalUserCommunities(mapped.length);
+        }
+      } catch (err: any) {
+        console.error("Failed to fetch user communities", err);
+        setCommunitiesError(
+          err?.response?.data?.message ||
+            err?.response?.data?.error ||
+            err?.message ||
+            "Failed to load communities"
+        );
+      } finally {
+        if (mounted) setLoadingCommunities(false);
+      }
+    };
+
+    fetchMyCommunities();
+    return () => {
+      mounted = false;
+    };
+  }, [page]);
 
   const handleViewCommunity = (communityName: string) => {
     const formattedName = communityName.toLowerCase().replace(/\s+/g, "-");
-    navigate(`/communities/${formattedName}`);
+    // store currently opened community briefly in localStorage so CommunityInfo can read it
+    const community = joinedCommunities.find((c) => c.name === communityName);
+    if (community) {
+      try {
+        localStorage.setItem("selectedCommunity", JSON.stringify(community));
+      } catch {
+        // ignore storage errors
+      }
+    }
+    navigate(`/communities/${formattedName}`, { state: community || null });
   };
 
   const toggleNotifications = (communityId: string) => {
-    setNotificationStates((prev) => ({
-      ...prev,
-      [communityId]: !prev[communityId],
-    }));
+    setNotificationStates((prev) => {
+      const next = { ...prev, [communityId]: !prev[communityId] };
+      // optionally persist preference to localStorage or send to server here
+      return next;
+    });
   };
 
   return (
@@ -295,7 +355,7 @@ function Dashboard() {
                     {portfolioStats.activePositions}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Across {mockJoinedCommunities.length} communities
+                    Across {totalUserCommunities} communities
                   </p>
                 </div>
                 <Activity className="w-8 h-8 text-blue-500" />
@@ -375,7 +435,20 @@ function Dashboard() {
               </Button>
             </div>
 
-            {mockJoinedCommunities.length === 0 ? (
+            {loadingCommunities ? (
+              <Card className="gradient-card border-border/50">
+                <CardContent className="text-center py-12">
+                  <div className="text-2xl mb-2">Loading your communities…</div>
+                </CardContent>
+              </Card>
+            ) : communitiesError ? (
+              <Card className="gradient-card border-border/50">
+                <CardContent className="text-center py-12">
+                  <div className="text-2xl mb-2">Error</div>
+                  <p className="text-sm text-red-400">{communitiesError}</p>
+                </CardContent>
+              </Card>
+            ) : joinedCommunities.length === 0 ? (
               <Card className="gradient-card border-border/50">
                 <CardContent className="text-center py-12">
                   <div className="text-6xl mb-4">🏘️</div>
@@ -394,100 +467,130 @@ function Dashboard() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mockJoinedCommunities.map((community) => (
-                  <Card
-                    key={community.id}
-                    className="gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 group border-gray-700"
-                  >
-                    <CardHeader>
-                      <div className="flex items-start justify-between text-left">
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="text-4xl">{community.icon}</div>
-                          <div className="flex-1">
-                            <h3
-                              className={`text-lg font-bold ${community.color} group-hover:text-primary transition-colors`}
-                            >
-                              {community.name}
-                            </h3>
-                            <Badge variant="outline" className="mt-1">
-                              {community.category}
-                            </Badge>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {joinedCommunities.map((community) => (
+                    <Card
+                      key={community.id}
+                      className="gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 group border-gray-700"
+                    >
+                      <CardHeader>
+                        <div className="flex items-start justify-between text-left">
+                          <div className="flex items-center gap-3 flex-1">
+                            <div className="text-4xl">{community.icon}</div>
+                            <div className="flex-1">
+                              <h3
+                                className={`text-lg font-bold ${community.color} group-hover:text-primary transition-colors`}
+                              >
+                                {community.name}
+                              </h3>
+                              <Badge variant="outline" className="mt-1">
+                                {community.category}
+                              </Badge>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleNotifications(community.id);
+                            }}
+                          >
+                            {notificationStates[community.id] ?? true ? (
+                              <Bell className="h-4 w-4 text-primary" />
+                            ) : (
+                              <BellOff className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </Button>
+                        </div>
+                      </CardHeader>
+
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          {community.description}
+                        </p>
+
+                        {community.unreadMessages > 0 && (
+                          <Badge className="mb-3 bg-primary/20 text-primary border-primary/30">
+                            {community.unreadMessages} unread message
+                            {community.unreadMessages !== 1 ? "s" : ""}
+                          </Badge>
+                        )}
+
+                        <div className="grid grid-cols-3 gap-2 text-center mb-3">
+                          <div className="bg-muted/20 rounded-lg p-2">
+                            <p className="text-xs text-muted-foreground">
+                              Members
+                            </p>
+                            <p className="text-sm font-semibold text-foreground">
+                              {community.members.toLocaleString()}
+                            </p>
+                          </div>
+                          <div className="bg-muted/20 rounded-lg p-2">
+                            <p className="text-xs text-muted-foreground">
+                              Markets
+                            </p>
+                            <p className="text-sm font-semibold text-foreground">
+                              {community.activeMarkets}
+                            </p>
+                          </div>
+                          <div className="bg-muted/20 rounded-lg p-2">
+                            <p className="text-xs text-muted-foreground">
+                              Volume
+                            </p>
+                            <p className="text-sm font-semibold text-green-500">
+                              {community.totalVolume}
+                            </p>
                           </div>
                         </div>
+
+                        <div className="text-xs text-muted-foreground">
+                          Last active: {community.lastActivity}
+                        </div>
+                      </CardContent>
+
+                      <CardFooter>
                         <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleNotifications(community.id);
-                          }}
+                          className="w-full btn-quantum"
+                          onClick={() => handleViewCommunity(community.name)}
                         >
-                          {notificationStates[community.id] ??
-                          community.isNotificationsEnabled ? (
-                            <Bell className="h-4 w-4 text-primary" />
-                          ) : (
-                            <BellOff className="h-4 w-4 text-muted-foreground" />
-                          )}
+                          Open
+                          <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        {community.description}
-                      </p>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
 
-                      {community.unreadMessages > 0 && (
-                        <Badge className="mb-3 bg-primary/20 text-primary border-primary/30">
-                          {community.unreadMessages} unread message
-                          {community.unreadMessages !== 1 ? "s" : ""}
-                        </Badge>
-                      )}
-
-                      <div className="grid grid-cols-3 gap-2 text-center mb-3">
-                        <div className="bg-muted/20 rounded-lg p-2">
-                          <p className="text-xs text-muted-foreground">
-                            Members
-                          </p>
-                          <p className="text-sm font-semibold text-foreground">
-                            {community.members.toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="bg-muted/20 rounded-lg p-2">
-                          <p className="text-xs text-muted-foreground">
-                            Markets
-                          </p>
-                          <p className="text-sm font-semibold text-foreground">
-                            {community.activeMarkets}
-                          </p>
-                        </div>
-                        <div className="bg-muted/20 rounded-lg p-2">
-                          <p className="text-xs text-muted-foreground">
-                            Volume
-                          </p>
-                          <p className="text-sm font-semibold text-green-500">
-                            {community.totalVolume}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="text-xs text-muted-foreground">
-                        Last active: {community.lastActivity}
-                      </div>
-                    </CardContent>
-                    <CardFooter>
-                      <Button
-                        className="w-full btn-quantum"
-                        onClick={() => handleViewCommunity(community.name)}
-                      >
-                        Open
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                ))}
-              </div>
+                {/* Simple server-driven pagination controls */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-6">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                    >
+                      <ArrowRight className="transform rotate-180 w-4 h-4" />
+                    </Button>
+                    <div className="text-sm text-muted-foreground">
+                      Page <strong>{page}</strong> of {totalPages}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() =>
+                        setPage((p) => Math.min(totalPages, p + 1))
+                      }
+                      disabled={page === totalPages}
+                    >
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </TabsContent>
 

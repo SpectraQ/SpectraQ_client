@@ -101,7 +101,7 @@
   }
 
   body {
-    background-color: hsl(var(--background));
+    background-color: rgb(7, 5, 5);
     color: hsl(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -600,6 +600,24 @@
 .text-success {
   color: greenyellow;
 }
+.success{
+  background: lightgreen;
+}
 .text-destructive{
   color:red
+}
+
+.bg-success{
+  background-color: green;
+}
+.bg-destructive{
+  background: red;
+}
+
+.bg-primary{
+  background: hsl(var(--quantum-red))
+}
+
+.text-foreground{
+  color:hsl(var(--quantum-red)) ;
 }

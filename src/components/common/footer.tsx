@@ -21,9 +21,7 @@ export const Footer = () => (
               <span className="text-xl font-bold text-foreground">
                 SpectraQ
               </span>
-              <span className="text-xs text-primary -mt-1">
-                Prediction Markets
-              </span>
+              
             </div>
           </Link>
           <p className="text-muted-foreground mt-4 text-sm">

@@ -9,6 +9,7 @@ import {
   ArrowRightIcon,
   ChartBarIcon,
   DollarSign,
+  Home,
   LucideShoppingBasket,
   MenuIcon,
   Plus,
@@ -32,7 +33,7 @@ export function Navigation() {
   }, []);
 
   const navLinks = [
-    { href: "/", label: "Home", icon: ChartBarIcon },
+    { href: "/", label: "Home", icon: Home },
     {
       href: "/markets",
       label: "Markets",
@@ -40,18 +41,18 @@ export function Navigation() {
       badge: "Hot",
     },
     { href: "/communities", label: "Communities", icon: User2 },
-    { href: "/create", label: "Create Market", icon: Plus },
+    { href: "/trading", label: "Trading", icon: Plus },
     { href: "/portfolio", label: "Portfolio", icon: DollarSign },
     { href: "/agent", label: "Agent", icon: SparklesIcon, badge: "New" },
   ];
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b-1 ${
         isScrolled ? "bg-card/95 backdrop-blur-md shadow-lg" : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
@@ -69,9 +70,7 @@ export function Navigation() {
               <span className="text-xl font-bold text-foreground">
                 SpectraQ
               </span>
-              <span className="text-xs text-primary -mt-1">
-                Prediction Markets
-              </span>
+              
             </div>
           </Link>
 
@@ -94,10 +93,7 @@ export function Navigation() {
                   <Icon className="w-4 h-4" />
                   <span>{link.label}</span>
                   {link.badge && (
-                    <Badge
-                      
-                      className="absolute -top-2 -right-2 px-1.5 py-0.5 text-[10px] bg-quantum-red"
-                    >
+                    <Badge className="absolute -top-2 -right-2 px-1.5 py-0.5 text-[10px] bg-quantum-red">
                       {link.badge}
                     </Badge>
                   )}
@@ -128,7 +124,7 @@ export function Navigation() {
           </div> */}
           <div className="flex gap-3">
             <Button
-            className="bg-quantum-red"
+              className="bg-quantum-red"
               onClick={() => {
                 nav("/login");
               }}

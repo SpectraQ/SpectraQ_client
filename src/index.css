@@ -618,6 +618,3 @@
   background: hsl(var(--quantum-red))
 }
 
-.text-foreground{
-  color:hsl(var(--quantum-red)) ;
-}

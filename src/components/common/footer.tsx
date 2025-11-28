@@ -21,12 +21,11 @@ export const Footer = () => (
               <span className="text-xl font-bold text-foreground">
                 SpectraQ
               </span>
-              
             </div>
           </Link>
-          <p className="text-muted-foreground mt-4 text-sm">
-            The next generation of decentralized prediction markets on
-            Avalanche.
+          <p className="text-muted-foreground mt-4 text-sm text-left">
+            Decentralized prediction marketplace with AI-driven hedging on APTOS
+            blockchain.
           </p>
         </div>
 
@@ -40,7 +39,7 @@ export const Footer = () => (
                 to="/markets"
                 className="text-muted-foreground hover:text-primary"
               >
-                Explore Markets
+                Market
               </Link>
             </li>
             <li>
@@ -48,7 +47,7 @@ export const Footer = () => (
                 to="/create"
                 className="text-muted-foreground hover:text-primary"
               >
-                Create Market
+                Trading
               </Link>
             </li>
             <li>
@@ -56,7 +55,7 @@ export const Footer = () => (
                 to="/markets?category=Crypto"
                 className="text-muted-foreground hover:text-primary"
               >
-                Crypto Markets
+                AI predictions
               </Link>
             </li>
             <li>
@@ -64,7 +63,7 @@ export const Footer = () => (
                 to="/markets?category=Politics"
                 className="text-muted-foreground hover:text-primary"
               >
-                Politics Markets
+                Portfolio
               </Link>
             </li>
           </ul>

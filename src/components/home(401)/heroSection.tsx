@@ -71,7 +71,7 @@ export const HeroSection = () => (
           {/* Badge */}
           <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-quantum-red/10 text-quantum-red mb-8 border border-quantum-red/20 backdrop-blur-sm mt-16">
             <Zap className="w-4 h-4 mr-2" />
-            Powered by APTOS Blockchain
+            Powered by Yellow Protocol
           </div>
 
           {/* Main Heading */}

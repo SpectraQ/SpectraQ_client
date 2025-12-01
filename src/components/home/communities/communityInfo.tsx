@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Users, TrendingUp, MessageCircle } from "lucide-react";
 import { CommunityChat } from "./communityChat";
-import { MarketCard } from "../markets/marketCard";
+// import { MarketCard } from "../markets/marketCard";
 import axios from "axios";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
@@ -305,51 +305,10 @@ const CommunityInfo = () => {
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="chat" className="w-full">
-          <TabsList className="grid w-full justify-center max-w-md mx-auto md:mx-0 grid-cols-2 mb-8 border border-gray-700">
-            <TabsTrigger
-              value="chat"
-              className="data-[state=active]:bg-red-600 data-[state=active]:text-white"
-            >
-              Community Chat
-            </TabsTrigger>
-            <TabsTrigger
-              value="markets"
-              className="data-[state=active]:bg-red-600 data-[state=active]:text-white"
-            >
-              Markets
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="chat">
-            <CommunityChat
-              communityId={community.id || ""}
-              communityName={community.name}
-            />
-          </TabsContent>
-
-          <TabsContent value="markets">
-            {mockMarkets.length === 0 ? (
-              <Card className="gradient-card border-border/50">
-                <CardContent className="text-center py-12">
-                  <div className="text-6xl mb-4">🔍</div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
-                    No markets found
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Try adjusting your search or category filter
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                {mockMarkets.map((market) => (
-                  <MarketCard key={market.id} market={market} />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+        <CommunityChat
+          communityId={community.id || ""}
+          communityName={community.name}
+        />
       </div>
     </div>
   );

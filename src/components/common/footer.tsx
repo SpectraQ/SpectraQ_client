@@ -24,8 +24,8 @@ export const Footer = () => (
             </div>
           </Link>
           <p className="text-muted-foreground mt-4 text-sm text-left">
-            Decentralized prediction marketplace with AI-driven hedging on APTOS
-            blockchain.
+            Decentralized prediction marketplace with AI-driven hedging on
+            Yellow Protocol.
           </p>
         </div>
 

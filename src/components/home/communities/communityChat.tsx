@@ -88,7 +88,7 @@ export const CommunityChat = ({
       return;
     }
 
-    const socketUrl = import.meta.env.VITE_URL_CHAT || window.location.origin;
+    const socketUrl = import.meta.env.VITE_URL_CHAT;
 
     const socket = io(socketUrl, {
       auth: { token },

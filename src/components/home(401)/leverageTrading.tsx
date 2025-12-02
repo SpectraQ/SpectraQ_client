@@ -23,9 +23,17 @@ export const LeverageTrading = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-          {/* Trading Interface */}
-          <Card className="lg:col-span-2 bg-card border-border">
+        {/* Added 'relative z-10' to this container to position the stamp */}
+        <div className="grid lg:grid-cols-3 gap-6 max-w-7xl mx-auto relative z-10">
+          {/* --- START: Launching Soon Stamp --- */}
+          <div className="absolute -top-6 -left-4 z-20 transform -rotate-12 pointer-events-none">
+            <div className="border-4 border-dashed border-red-500/60 bg-background/80 backdrop-blur-sm text-red-600 px-6 py-2 font-black uppercase text-sm tracking-widest shadow-sm rounded-sm">
+              Launching Soon
+            </div>
+          </div>
+          {/* --- END: Stamp --- */}
+
+          <Card className="lg:col-span-2 bg-card border-border relative overflow-hidden">
             <CardHeader>
               <CardTitle>Open Position</CardTitle>
             </CardHeader>
@@ -128,8 +136,11 @@ export const LeverageTrading = () => {
 
                     <Button
                       variant={activeTab === "long" ? "default" : "destructive"}
-                      className="w-full bg-green-600 text-white"
+                      // Added opacity-90 and cursor-not-allowed to simulate disabled state visually
+                      className="w-full bg-green-600 text-white opacity-90 cursor-not-allowed"
                       size="lg"
+                      // Optional: actually disable the button
+                      // disabled={true}
                     >
                       Open {activeTab === "long" ? "Long" : "Short"} Position
                     </Button>

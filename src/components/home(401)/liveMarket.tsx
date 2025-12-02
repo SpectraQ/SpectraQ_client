@@ -20,7 +20,7 @@ export const MarketOverview = () => {
 
   const API_URL = import.meta.env.VITE_URL_CHAT;
   const CACHE_KEY = "market_data_cache";
-  const CACHE_TIME = 10 * 60 * 1000; // 10 minutes
+  const CACHE_TIME = 60 * 60 * 1000; // 60 MIN
 
   useEffect(() => {
     const fetchMarketData = async () => {

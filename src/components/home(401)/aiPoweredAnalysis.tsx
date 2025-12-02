@@ -46,6 +46,7 @@ export const AIPredictions = () => {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full border border-red-500/30 bg-red-500/10 text-quantum-red">
             <Brain className="h-4 w-4 text-primary" />
+
             <span className="text-sm font-medium text-primary">
               AI-Powered Analysis
             </span>
@@ -56,12 +57,25 @@ export const AIPredictions = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+        {/* Added 'relative' to this container so the stamp positions correctly */}
+        <div className="grid lg:grid-cols-3 gap-6 max-w-7xl mx-auto relative z-10">
+          {/* --- START: Launching Soon Stamp --- */}
+          {/* This div creates the "stamp" look in the top left corner */}
+          <div className="absolute -top-6 -left-4 z-20 transform -rotate-12 pointer-events-none">
+            <div className="border-4 border-dashed border-red-500/60 bg-background/80 backdrop-blur-sm text-red-600 px-6 py-2 font-black uppercase text-sm tracking-widest shadow-sm rounded-sm">
+              Launching Soon
+            </div>
+          </div>
+          {/* --- END: Stamp --- */}
+
           {predictions.map((prediction, index) => (
             <Card
               key={index}
+              // Removed 'relative overflow-hidden' as individual ribbons are gone
               className="bg-card border-border hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/20"
             >
+              {/* Individual Ribbon removed from here */}
+
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>

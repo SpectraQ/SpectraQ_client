@@ -14,6 +14,7 @@ import DashboardPage from "./pages/home/dashboard";
 import { useEffect } from "react";
 import useAuth from "./hooks/useAuth";
 import { setAuthToken } from "./store/api/axiosConfig";
+import { LiveMarket } from "./pages/home/markets";
 
 function App() {
   const auth = useAuth();
@@ -104,7 +105,7 @@ function App() {
           path="/markets"
           element={
             <CheckAuth>
-              <Dashboard />
+              <LiveMarket />
             </CheckAuth>
           }
         />

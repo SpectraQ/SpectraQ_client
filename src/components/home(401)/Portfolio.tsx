@@ -13,7 +13,17 @@ export const Portfolio = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-8">
+        {/* Added 'relative z-10' to this container to position the stamp */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-8 relative z-10">
+          
+          {/* --- START: Launching Soon Stamp --- */}
+          <div className="absolute -top-6 -left-4 z-20 transform -rotate-12 pointer-events-none">
+            <div className="border-4 border-dashed border-red-500/60 bg-background/80 backdrop-blur-sm text-red-600 px-6 py-2 font-black uppercase text-sm tracking-widest shadow-sm rounded-sm">
+              Launching Soon
+            </div>
+          </div>
+          {/* --- END: Stamp --- */}
+
           <Card className="bg-card border-border">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">

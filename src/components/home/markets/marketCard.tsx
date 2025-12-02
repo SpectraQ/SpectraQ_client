@@ -2,7 +2,7 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown } from "lucide-react";
 
-interface LiveMarketData {
+export interface LiveMarketData {
   symbol: string;
   name: string;
   price: number;

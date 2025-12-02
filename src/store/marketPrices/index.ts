@@ -1,7 +1,7 @@
 // src/store/marketsApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const BASE_URL = import.meta.env.VITE_URL_CHAT;
+const BASE_URL = import.meta.env.VITE_URL_MARKET;
 
 interface CoinData {
   id: number;

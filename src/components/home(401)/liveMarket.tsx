@@ -18,7 +18,7 @@ export const MarketOverview = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const API_URL = import.meta.env.VITE_URL_CHAT;
+  const API_URL = import.meta.env.VITE_URL_MARKET;
   const CACHE_KEY = "market_data_cache";
   const CACHE_TIME = 60 * 60 * 1000; // 60 MIN
 

@@ -16,6 +16,7 @@ import useAuth from "./hooks/useAuth";
 import { setAuthToken } from "./store/api/axiosConfig";
 import { LiveMarket } from "./pages/home/markets";
 import Agent from "./pages/home/agent";
+import Portfolio from "./pages/home/portfolio";
 
 function App() {
   const auth = useAuth();
@@ -114,7 +115,7 @@ function App() {
           path="/portfolio"
           element={
             <CheckAuth>
-              <Dashboard />
+              <Portfolio />
             </CheckAuth>
           }
         />

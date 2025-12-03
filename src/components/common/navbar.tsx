@@ -59,7 +59,7 @@ export function Navigation() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-[100] border-b transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-100 border-b transition-all duration-300 ${
         isScrolled ? "bg-card/90 backdrop-blur-lg shadow-md" : "bg-transparent"
       }`}
     >

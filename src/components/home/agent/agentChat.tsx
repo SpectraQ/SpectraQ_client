@@ -5,16 +5,13 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Bot, Send, Loader2 } from "lucide-react";
 
-// --- Auto Replies ---
+// --- Auto fallback replies ---
 const AUTO_REPLIES = [
   "Thanks for your question! SpectraQ's AI engine is almost ready — full market predictions will be available at launch.",
   "Our AI is warming up! Real-time BTC, ETH, and SOL insights will be enabled when we go live.",
   "We're launching very soon — your question has been received. Full AI responses will activate soon!",
   "Hang tight! SpectraQ's market-prediction AI is training in the background. Full answers coming at launch.",
   "We're in early access mode — detailed predictions and trading strategies go live shortly!",
-  "Our AI assistant is almost online! Market insights for BTC, ETH, and SOL will be unlocked soon.",
-  "SpectraQ AI is getting its final upgrades. Full-power responses will be available at launch.",
-  "Your message is noted! Real trading signals, predictions, and analytics will be enabled soon.",
 ];
 
 const getRandomReply = () =>
@@ -26,7 +23,9 @@ interface Message {
   timestamp: Date;
 }
 
-export const AIAssistant = () => {
+export const SpectraAgent = () => {
+  const apiKey = import.meta.env.VITE_GEMINI_KEY;
+
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -35,6 +34,7 @@ export const AIAssistant = () => {
       timestamp: new Date(),
     },
   ]);
+
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -44,6 +44,65 @@ export const AIAssistant = () => {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // ------ Gemini Response Handler ------
+  const getGeminiReply = async (text: string) => {
+    const systemPrompt = `
+      You are SpectraQ Crypto Intelligence Agent.
+      Only answer questions related to:
+      - Bitcoin (BTC)
+      - Ethereum (ETH)
+      - Solana (SOL)
+      - General crypto markets, trading, risk, leverage, volatility.
+
+      If a question is outside crypto, politely redirect:
+      "I only provide insights on crypto markets such as BTC, ETH, and SOL."
+
+      Keep replies concise, actionable, and market-focused.
+      No disclaimers. No financial advice phrasing needed.
+    `;
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+    const payload = {
+      contents: [{ parts: [{ text }] }],
+      systemInstruction: { parts: [{ text: systemPrompt }] },
+    };
+
+    const maxRetries = 5;
+    let attempt = 0;
+    let delay = 1000;
+
+    while (attempt < maxRetries) {
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const output = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        return output ? output.trim() : getRandomReply();
+      } catch (err) {
+        attempt++;
+        if (attempt >= maxRetries) {
+          console.error("Gemini API Error after retries:", err);
+          return getRandomReply();
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        delay *= 2;
+      }
+    }
+
+    return getRandomReply();
+  };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -58,17 +117,16 @@ export const AIAssistant = () => {
     setInput("");
     setIsLoading(true);
 
-    // Simulate AI delay + send automated reply
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        role: "assistant",
-        content: getRandomReply(),
-        timestamp: new Date(),
-      };
+    const reply = await getGeminiReply(input);
 
-      setMessages((prev) => [...prev, assistantMessage]);
-      setIsLoading(false);
-    }, 1200); // clean, realistic delay
+    const assistantMessage: Message = {
+      role: "assistant",
+      content: reply,
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, assistantMessage]);
+    setIsLoading(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -79,7 +137,7 @@ export const AIAssistant = () => {
   };
 
   return (
-    <section id="ai-assistant" className="py-20 bg-secondary/30 text-left">
+    <section id="ai-assistant" className="py-10 bg-secondary/30 text-left">
       <div className="container mx-auto px-4">
         {/* Section heading */}
         <div className="text-center mb-12">
@@ -96,10 +154,9 @@ export const AIAssistant = () => {
         </div>
 
         <div className="max-w-4xl mx-auto relative z-10">
-          {/* Launching Soon Stamp */}
           <div className="absolute -top-12 -left-4 z-20 transform -rotate-12 pointer-events-none">
             <div className="border-4 border-dashed border-red-500/60 bg-background/80 backdrop-blur-sm text-red-600 px-6 py-2 font-black uppercase text-sm tracking-widest shadow-sm rounded-sm">
-              Launching Soon
+              Live Now
             </div>
           </div>
 

@@ -15,6 +15,7 @@ import { useEffect } from "react";
 import useAuth from "./hooks/useAuth";
 import { setAuthToken } from "./store/api/axiosConfig";
 import { LiveMarket } from "./pages/home/markets";
+import Agent from "./pages/home/agent";
 
 function App() {
   const auth = useAuth();
@@ -114,6 +115,14 @@ function App() {
           element={
             <CheckAuth>
               <Dashboard />
+            </CheckAuth>
+          }
+        />
+        <Route
+          path="/agent"
+          element={
+            <CheckAuth>
+              <Agent />
             </CheckAuth>
           }
         />

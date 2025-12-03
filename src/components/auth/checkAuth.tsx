@@ -67,6 +67,7 @@ const CheckAuth: React.FC<CheckAuthProps> = ({ children }) => {
     "/communities",
     "/markets",
     "/portfolio",
+    "/agent",
   ];
   const isProtectedPath = protectedPaths.some((p) => pathname.startsWith(p));
 

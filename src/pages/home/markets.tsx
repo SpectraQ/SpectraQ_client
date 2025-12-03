@@ -72,11 +72,11 @@ export const LiveMarket = () => {
       symbol: coin.symbol,
       name: coin.name,
       price: coin.quote.USD.price,
-      change24h: coin.quote.USD.percent_change_24h,
+      change1h: coin.quote.USD.percent_change_1h,
       prediction:
-        coin.quote.USD.percent_change_24h > 0
+        coin.quote.USD.percent_change_1h > 0
           ? "bullish"
-          : coin.quote.USD.percent_change_24h < 0
+          : coin.quote.USD.percent_change_1h < 0
           ? "bearish"
           : "neutral",
       confidence: Math.min(
@@ -139,10 +139,10 @@ export const LiveMarket = () => {
 
   // ↕️ Sorting
   if (sortBy === "gainers") {
-    displayedMarkets.sort((a, b) => b.change24h - a.change24h);
+    displayedMarkets.sort((a, b) => b.change1h - a.change1h);
   }
   if (sortBy === "losers") {
-    displayedMarkets.sort((a, b) => a.change24h - b.change24h);
+    displayedMarkets.sort((a, b) => a.change1h - b.change1h);
   }
   if (sortBy === "marketcap") {
     displayedMarkets.sort((a, b) => b.price - a.price);

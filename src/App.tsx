@@ -1,7 +1,6 @@
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/home(401)/home";
-import Dashboard from "./pages/home/dashboard";
 import LoginPage from "./pages/auth/loginPage";
 import SignupPage from "./pages/auth/signupPage";
 import EmailVerifyPage from "./pages/auth/emailVerifyPage";

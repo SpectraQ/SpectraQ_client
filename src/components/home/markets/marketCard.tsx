@@ -6,7 +6,7 @@ export interface LiveMarketData {
   symbol: string;
   name: string;
   price: number;
-  change24h: number;
+  change1h: number;
   prediction: "bullish" | "bearish" | "neutral";
   confidence: number;
 }
@@ -61,15 +61,15 @@ export function LiveMarketCard({ market }: { market: LiveMarketData }) {
 
           <div
             className={`flex items-center gap-1 text-sm font-medium mt-1 ${
-              market.change24h >= 0 ? "text-success" : "text-destructive"
+              market.change1h >= 0 ? "text-success" : "text-destructive"
             }`}
           >
-            {market.change24h >= 0 ? (
+            {market.change1h >= 0 ? (
               <TrendingUp className="h-4 w-4" />
             ) : (
               <TrendingDown className="h-4 w-4" />
             )}
-            {Math.abs(market.change24h)}% (24h)
+            {Math.abs(market.change1h)}% (1h)
           </div>
         </div>
 

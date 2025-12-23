@@ -10,6 +10,7 @@ import {
   BadgeDollarSign,
   User,
   Bot,
+  ChartArea,
 } from "lucide-react";
 import logo from "@/assets/logo.jpg";
 import Header from "./header";
@@ -80,6 +81,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { path: "/markets", icon: BadgeDollarSign, label: "Markets" },
     { path: "/portfolio", icon: User, label: "Portfolio" },
     { path: "/agent", icon: Bot, label: "Agent" },
+    { path: "/charts", icon: ChartArea, label: "Charts" },
   ];
 
   return (

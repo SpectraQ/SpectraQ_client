@@ -126,6 +126,14 @@ function App() {
             </CheckAuth>
           }
         />
+        <Route
+          path="/charts"
+          element={
+            <CheckAuth>
+              <Agent />
+            </CheckAuth>
+          }
+        />
       </Routes>
     </>
   );

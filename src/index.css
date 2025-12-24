@@ -47,6 +47,7 @@
 
     /* Custom SpectraQ colors */
     --quantum-red: 0 72% 51%;
+    --hover-red: 0 72% 40%
     --quantum-red-dark: 0 72% 35%;
     --quantum-black: 222 47% 3%;
     --quantum-gray: 222 47% 8%;

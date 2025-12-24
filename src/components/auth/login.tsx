@@ -32,7 +32,7 @@ const BrandingPanel = () => {
           onClick={() => nav("/")}
         >
           <ArrowLeft size={14} />
-          Return to Terminal
+          Return to base
         </div>
       </div>
 
@@ -46,12 +46,12 @@ const BrandingPanel = () => {
           />
         </div>
 
-        <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">
-          SpectraQ <span className="text-gray-600">ID</span>
+        <h1 className="text-4xl md:text-5xl font-bold text-quantum-red tracking-tight mb-4">
+          SpectraQ
         </h1>
 
         <p className="text-gray-400 max-w-sm mx-auto text-lg leading-relaxed">
-          Secure gateway to the decentralized prediction marketplace.
+         Intelligent Hedging backed by AI
         </p>
       </div>
 
@@ -185,7 +185,7 @@ const LoginForm = () => {
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-white tracking-tight">
+            <h1 className="text-2xl font-bold text-quantum-red tracking-tight">
               Authenticate
             </h1>
             <Badge
@@ -195,7 +195,7 @@ const LoginForm = () => {
               <ShieldCheck className="w-3 h-3 mr-1" /> SECURE
             </Badge>
           </div>
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-400 text-sm text-left">
             Enter credentials to access the trading layer.
           </p>
         </div>
@@ -234,7 +234,7 @@ const LoginForm = () => {
                   to="/forgot-password"
                   className="text-xs text-gray-500 hover:text-white transition-colors"
                 >
-                  Recovery?
+                  Forgot Password?
                 </Link>
               </div>
               <div className="relative">
@@ -270,7 +270,7 @@ const LoginForm = () => {
 
           <Button
             type="submit"
-            className="w-full h-11 bg-white text-black hover:bg-gray-200 font-medium text-sm transition-all rounded-md"
+            className="w-full h-11 bg-quantum-red text-white hover:bg-red-700 font-medium text-sm transition-all rounded-md"
             disabled={loading || submitted}
           >
             {loading || submitted ? (
@@ -291,7 +291,7 @@ const LoginForm = () => {
             No access token?{" "}
             <Link
               to="/signup"
-              className="text-white hover:underline decoration-white/30 underline-offset-4"
+              className="text-red-500 hover:underline decoration-white/30 underline-offset-4"
             >
               Initialize Account
             </Link>

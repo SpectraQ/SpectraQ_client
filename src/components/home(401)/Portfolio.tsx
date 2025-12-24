@@ -1,316 +1,182 @@
-import { useState } from "react";
+import {
+  ShieldAlert,
+  Activity,
+  BrainCircuit,
+  LineChart,
+  Layers,
+  Zap,
+  ArrowRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Wallet,
-  TrendingUp,
-  AlertTriangle,
-  ArrowUpRight,
-  ShieldCheck,
-  PieChart,
-  Activity,
-} from "lucide-react";
 
-export const Portfolio = () => {
-  const [activeTab, setActiveTab] = useState("positions");
-
-  // Simulated Professional Data
-  const POSITIONS = [
-    {
-      asset: "BTC",
-      type: "LONG",
-      size: 0.85,
-      entry: 92400,
-      current: 94230,
-      pnl: 1555.5,
-      leverage: 10,
-    },
-    {
-      asset: "ETH",
-      type: "SHORT",
-      size: 12.5,
-      entry: 3550,
-      current: 3450,
-      pnl: 1250.0,
-      leverage: 5,
-    },
-    {
-      asset: "SOL",
-      type: "LONG",
-      size: 450,
-      entry: 132,
-      current: 145,
-      pnl: 5850.0,
-      leverage: 3,
-    },
-  ];
-
+export const PortfolioFeatures = () => {
   return (
-    <section className="py-24 bg-[#050505] border-t border-white/5 relative overflow-hidden">
-      {/* Background Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+    <section className="py-24 bg-[#050505] relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-500/5 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="container mx-auto px-4 max-w-6xl relative z-10">
-        {/* SECTION HEADER */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Badge
-                variant="outline"
-                className="bg-green-500/10 text-green-500 border-green-500/20 px-2 py-0.5 text-[10px] tracking-wider uppercase"
-              >
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2 animate-pulse" />
-                Live Connected
-              </Badge>
-              <span className="text-xs text-gray-500 font-mono">
-                0x71C...9A23
-              </span>
-            </div>
-            <h2 className="text-3xl font-semibold text-quantum-red tracking-tight">
-              Portfolio Management
-            </h2>
-          </div>
-
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              className="bg-quantum-red/5 border-white/10 text-gray-300 hover:bg-quantum-red/10 hover:text-white"
-            >
-              <Activity className="w-4 h-4 mr-2" /> History
-            </Button>
-            <Button className="bg-quantum-red text-white hover:bg-red-700">
-              <Wallet className="w-4 h-4 mr-2" /> Deposit Assets
-            </Button>
-          </div>
+      <div className="container mx-auto px-4 max-w-7xl relative z-10">
+        {/* HEADER */}
+        <div className="text-center max-w-3xl mx-auto mb-20">
+          <Badge
+            variant="outline"
+            className="mb-4 border-blue-500/30 text-blue-400 bg-blue-500/10"
+          >
+            <Activity className="w-3 h-3 mr-1" />
+            Portfolio Management Layer
+          </Badge>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
+            Institutional-Grade <br />
+            <span className="text-transparent bg-clip-text bg-quantum-red">
+              Position Control.
+            </span>
+          </h2>
+          <p className="text-xl text-gray-400 leading-relaxed">
+            Stop trading in the dark. Our portfolio engine provides real-time
+            risk telemetry, AI-driven hedge suggestions, and unified
+            cross-margin analysis.
+          </p>
         </div>
 
-        {/* METRICS HEADER (THE HUD)  */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-lg relative overflow-hidden group">
-            <div className="text-gray-500 text-xs font-mono uppercase mb-1">
-              Net Worth
-            </div>
-            <div className="text-3xl font-mono text-white tracking-tighter">
-              $124,592.00
-            </div>
-            <div className="flex items-center text-xs text-green-500 mt-2 font-mono">
-              <TrendingUp className="w-3 h-3 mr-1" /> +$2,450.23 (24h)
-            </div>
-          </div>
-
-          <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-lg">
-            <div className="text-gray-500 text-xs font-mono uppercase mb-1">
-              Unrealized PnL
-            </div>
-            <div className="text-2xl font-mono text-green-400">+$8,655.50</div>
-            <div className="w-full bg-quantum-red/5 h-1 mt-4 rounded-full overflow-hidden">
-              <div className="bg-green-500 w-[70%] h-full"></div>
-            </div>
-          </div>
-
-          <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-lg relative">
-            <div className="flex justify-between items-start">
-              <div>
-                <div className="text-gray-500 text-xs font-mono uppercase mb-1">
-                  Health Factor
-                </div>
-                <div className="text-2xl font-mono text-white">1.85</div>
-              </div>
-              <ShieldCheck className="text-green-500 w-5 h-5" />
-            </div>
-            <div className="text-xs text-gray-500 mt-2">
-              Liquidation at &lt; 1.00
-            </div>
-            {/* Visual Gauge */}
-            <div className="flex gap-1 mt-3">
-              <div className="h-1.5 w-full bg-red-500 rounded-sm opacity-20"></div>
-              <div className="h-1.5 w-full bg-yellow-500 rounded-sm opacity-20"></div>
-              <div className="h-1.5 w-full bg-green-500 rounded-sm"></div>
-            </div>
-          </div>
-
-          <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-lg">
-            <div className="text-gray-500 text-xs font-mono uppercase mb-1">
-              Active Exposure
-            </div>
-            <div className="text-2xl font-mono text-white">$425,000</div>
-            <div className="text-xs text-yellow-500 mt-2 flex items-center">
-              <AlertTriangle className="w-3 h-3 mr-1" /> High Leverage (4.2x)
-            </div>
-          </div>
-        </div>
-
-        {/* MAIN DASHBOARD AREA */}
+        {/* FEATURE GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* LEFT: Positions Table (2/3 width) */}
-          <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-xl overflow-hidden min-h-[400px]">
-            <Tabs defaultValue="positions" className="w-full">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-quantum-red/[0.02]">
-                <TabsList className="bg-transparent h-8 p-0 gap-6">
-                  <TabsTrigger
-                    value="positions"
-                    className="data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-quantum-red rounded-none px-0 pb-2 text-gray-500 hover:text-gray-300 transition-all font-medium text-sm"
-                  >
-                    Open Positions
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="orders"
-                    className="data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-quantum-red rounded-none px-0 pb-2 text-gray-500 hover:text-gray-300 transition-all font-medium text-sm"
-                  >
-                    Open Orders (2)
-                  </TabsTrigger>
-                </TabsList>
-                <div className="text-xs text-gray-500 font-mono">
-                  Auto-refreshing
+          {/* FEATURE 1: The Risk Engine (Large Card) */}
+          <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+            <div className="relative z-10 flex flex-col h-full justify-between">
+              <div>
+                <div className="w-12 h-12 bg-red-500/10 rounded-lg flex items-center justify-center mb-6 border border-red-500/20">
+                  <ShieldAlert className="w-6 h-6 text-red-500" />
                 </div>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  Real-Time Risk Telemetry
+                </h3>
+                <p className="text-gray-400 max-w-md">
+                  We don't just show PnL. We calculate your{" "}
+                  <strong>Health Factor</strong>,{" "}
+                  <strong>Liquidation Proximity</strong>, and{" "}
+                  <strong>Delta Exposure</strong> every block.
+                </p>
               </div>
 
-              <TabsContent value="positions" className="m-0">
-                {/* Table Header */}
-                <div className="grid grid-cols-5 px-6 py-3 border-b border-white/5 text-[10px] uppercase text-gray-500 font-mono tracking-wider">
-                  <div className="col-span-2">Instrument</div>
-                  <div className="text-right">Size</div>
-                  <div className="text-right">Entry / Mark</div>
-                  <div className="text-right">PnL</div>
-                </div>
+              {/* ABSTRACT VISUALIZATION: The "Scanner" */}
+              <div className="mt-8 bg-black/50 border border-white/10 rounded-xl p-6 relative overflow-hidden">
+                {/* Scanning Line Animation */}
+                <div className="absolute top-0 bottom-0 w-[2px] bg-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.5)] left-0 animate-[scan_3s_ease-in-out_infinite]" />
 
-                {/* Table Rows */}
-                <div className="divide-y divide-white/5">
-                  {POSITIONS.map((pos) => (
-                    <div
-                      key={pos.asset}
-                      className="grid grid-cols-5 px-6 py-4 items-center hover:bg-quantum-red/[0.02] transition-colors group cursor-pointer"
-                    >
-                      <div className="col-span-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-white">
-                            {pos.asset}-USD
-                          </span>
-                          <Badge
-                            variant="outline"
-                            className={`border-0 text-[10px] px-1.5 py-0 rounded-sm ${
-                              pos.type === "LONG"
-                                ? "bg-green-500/20 text-green-500"
-                                : "bg-red-500/20 text-red-500"
-                            }`}
-                          >
-                            {pos.type} {pos.leverage}x
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm text-gray-300 font-mono">
-                          {pos.size} {pos.asset}
-                        </div>
-                        <div className="text-[10px] text-gray-500">
-                          ${(pos.size * pos.current).toLocaleString()}
-                        </div>
-                      </div>
-                      <div className="text-right font-mono text-sm text-gray-300">
-                        <div>{pos.entry.toLocaleString()}</div>
-                        <div className="text-[10px] text-gray-500">
-                          {pos.current.toLocaleString()}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div
-                          className={`font-mono text-sm ${
-                            pos.pnl > 0 ? "text-green-500" : "text-red-500"
-                          }`}
-                        >
-                          {pos.pnl > 0 ? "+" : ""}
-                          {pos.pnl.toLocaleString()}
-                        </div>
-                        <div
-                          className={`text-[10px] ${
-                            pos.pnl > 0
-                              ? "text-green-500/70"
-                              : "text-red-500/70"
-                          }`}
-                        >
-                          {(
-                            (pos.pnl / (pos.size * pos.entry)) *
-                            100 *
-                            pos.leverage
-                          ).toFixed(2)}
-                          %
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-
-          {/* RIGHT: AI Insights (1/3 width) */}
-          <div className="space-y-6">
-            {/* AI Suggestion Card */}
-            <div className="bg-gradient-to-br from-white/5 to-black border border-white/10 rounded-xl p-5 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10">
-                <PieChart className="w-24 h-24 text-quantum-red rotate-12" />
-              </div>
-
-              <div className="flex items-center gap-2 mb-4 relative z-10">
-                <Badge className="bg-quantum-red text-white hover:bg-red-600 border-0">
-                  AI Action Required
-                </Badge>
-              </div>
-
-              <h3 className="text-lg font-bold text-white mb-2 relative z-10">
-                Delta Imbalance Detected
-              </h3>
-              <p className="text-sm text-gray-400 mb-6 leading-relaxed relative z-10">
-                Your portfolio is 85% Long Delta. Market sentiment is shifting
-                Bearish on the 4H timeframe.
-              </p>
-
-              <div className="space-y-3 relative z-10">
-                <div className="bg-black/40 border border-white/10 p-3 rounded flex items-start gap-3">
-                  <ArrowUpRight className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
-                  <div>
-                    <div className="text-sm font-medium text-white">
-                      Suggestion: Hedge BTC
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      Open 0.5 BTC Short @ Market
-                    </div>
+                <div className="space-y-4 opacity-50">
+                  {/* Abstract Rows representing data */}
+                  <div className="flex justify-between items-center">
+                    <div className="h-2 w-24 bg-gray-700 rounded-full" />
+                    <div className="h-2 w-12 bg-gray-700 rounded-full" />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="h-2 w-32 bg-gray-700 rounded-full" />
+                    <div className="h-2 w-16 bg-red-500/50 rounded-full" />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="h-2 w-20 bg-gray-700 rounded-full" />
+                    <div className="h-2 w-8 bg-green-500/50 rounded-full" />
                   </div>
                 </div>
-                <Button className="w-full bg-quantum-red text-white hover:bg-red-700">
-                  Execute Auto-Hedge
-                </Button>
+
+                {/* Overlay Label */}
+                <div className="absolute bottom-4 right-4 bg-red-900/80 text-red-200 text-[10px] font-mono px-2 py-1 rounded border border-red-500/30 backdrop-blur-md">
+                  RISK_SCANNER: ACTIVE
+                </div>
               </div>
             </div>
+          </div>
 
-            {/* Quick Allocation View */}
-            <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-5">
-              <h4 className="text-sm font-medium text-gray-300 mb-4">
-                Asset Allocation
-              </h4>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center text-gray-400">
-                    <span className="w-2 h-2 rounded-full bg-orange-500 mr-2"></span>{" "}
-                    BTC
-                  </span>
-                  <span className="font-mono text-white">65%</span>
-                </div>
-                <div className="w-full bg-quantum-red/5 h-1 rounded-full">
-                  <div className="bg-orange-500 w-[65%] h-full rounded-full"></div>
-                </div>
+          {/* FEATURE 2: AI Guardian */}
+          <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 relative overflow-hidden group">
+            <div className="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mb-6 border border-purple-500/20">
+              <BrainCircuit className="w-6 h-6 text-purple-500" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">AI Guardian</h3>
+            <p className="text-sm text-gray-400 leading-relaxed mb-8">
+              Our model monitors market volatility against your open positions.
+              If your risk score spikes, the AI suggests specific hedge trades
+              to neutralize delta.
+            </p>
 
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center text-gray-400">
-                    <span className="w-2 h-2 rounded-full bg-blue-500 mr-2"></span>{" "}
-                    ETH
-                  </span>
-                  <span className="font-mono text-white">25%</span>
+            {/* Abstract Suggestion UI */}
+            <div className="bg-white/5 rounded-lg p-4 border border-white/5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
+                  <Zap className="w-4 h-4 text-purple-400" />
                 </div>
-                <div className="w-full bg-quantum-red/5 h-1 rounded-full">
-                  <div className="bg-blue-500 w-[25%] h-full rounded-full"></div>
+                <div className="space-y-1">
+                  <div className="h-2 w-20 bg-gray-600 rounded-full" />
+                  <div className="h-1.5 w-12 bg-gray-700 rounded-full" />
                 </div>
+              </div>
+              <div className="h-8 w-full bg-purple-600/20 rounded border border-purple-500/30 flex items-center justify-center text-[10px] text-purple-300 font-mono">
+                AUTO-HEDGE EXECUTE
+              </div>
+            </div>
+          </div>
+
+          {/* FEATURE 3: Performance Analytics */}
+          <div className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 flex flex-col">
+            <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center mb-6 border border-green-500/20">
+              <LineChart className="w-6 h-6 text-green-500" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">
+              Performance Attribution
+            </h3>
+            <p className="text-sm text-gray-400 mb-6">
+              Deep dive into your trading history. Analyze win-rates, Sharpe
+              ratios, and fee drag to optimize your strategy.
+            </p>
+            <div className="mt-auto flex gap-1 h-12 items-end">
+              {[40, 65, 45, 80, 55, 90, 70].map((h, i) => (
+                <div
+                  key={i}
+                  className="flex-1 bg-green-500/20 hover:bg-green-500/40 transition-colors rounded-sm border-t border-green-500/50"
+                  style={{ height: `${h}%` }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* FEATURE 4: Cross-Chain (Large Card) */}
+          <div className="lg:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8">
+            <div className="flex-1">
+              <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-6 border border-blue-500/20">
+                <Layers className="w-6 h-6 text-blue-500" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">
+                Unified Liquidity View
+              </h3>
+              <p className="text-gray-400 mb-6">
+                Managing positions across chains is a nightmare. SpectraQ
+                aggregates your state channels into a single "Master View,"
+                handling settlement across BTC, ETH, and SOL layers
+                automatically.
+              </p>
+              <Button
+                variant="link"
+                className="text-blue-400 p-0 hover:text-blue-300"
+              >
+                Learn about Yellow Protocol Settlement{" "}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+
+            {/* Abstract Layer Visual */}
+            <div className="flex-1 w-full max-w-xs relative perspective-1000">
+              <div className="w-full h-24 bg-gray-900 border border-white/10 rounded-lg transform rotate-x-12 translate-y-4 opacity-50 flex items-center justify-center text-xs text-gray-600 font-mono">
+                L1 SETTLEMENT
+              </div>
+              <div className="w-full h-24 bg-gray-800 border border-white/20 rounded-lg transform -rotate-x-12 -translate-y-8 z-10 flex items-center justify-center text-xs text-gray-400 font-mono shadow-xl">
+                STATE CHANNEL
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-px h-full bg-blue-500/50" />
               </div>
             </div>
           </div>

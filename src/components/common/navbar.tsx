@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Menu,
@@ -9,6 +9,8 @@ import {
   ChevronDown,
   Terminal,
   Activity,
+  LogIn,
+  ArrowRight,
 } from "lucide-react";
 import logo from "@/assets/logo.jpg"; // Ensure this path exists
 
@@ -52,6 +54,7 @@ export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const nav = useNavigate();
 
   // Handle scroll effect for glassmorphism
   useEffect(() => {
@@ -63,10 +66,10 @@ export const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { name: "Markets", path: "/markets" },
-    { name: "Trading", path: "/trading" },
-    { name: "AI Signals", path: "/predictions" },
-    { name: "Community", path: "/community" }, // New link
+    { name: "Live Markets", path: "#markets" },
+
+    { name: "Agent", path: "/predictions" },
+    { name: "Communities", path: "/community" }, // New link
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -106,9 +109,9 @@ export const Navbar = () => {
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-1">
               {navLinks.map((link) => (
-                <Link
+                <a
                   key={link.name}
-                  to={link.path}
+                  href={link.path}
                   className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
                     isActive(link.path)
                       ? "text-white bg-white/10"
@@ -116,7 +119,7 @@ export const Navbar = () => {
                   }`}
                 >
                   {link.name}
-                </Link>
+                </a>
               ))}
             </nav>
 
@@ -136,9 +139,21 @@ export const Navbar = () => {
               <Button
                 size="sm"
                 className="bg-quantum-red text-white hover:bg-red-700 font-medium border border-transparent"
+                onClick={() => {
+                  nav("/login");
+                }}
               >
-                <Wallet className="w-4 h-4 mr-2" />
-                Connect Wallet
+                Login
+              </Button>
+              <Button
+                size="sm"
+                className="bg-transparent  text-gray-400 hover:text-white font-medium border border-transparent"
+                onClick={() => {
+                  nav("/signup");
+                }}
+              >
+                Get Started
+                <ArrowRight />
               </Button>
             </div>
 
@@ -194,10 +209,25 @@ export const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
-              <div className="pt-4 mt-4 border-t border-white/10">
-                <Button className="w-full bg-white text-black justify-center">
-                  <Wallet className="w-4 h-4 mr-2" />
-                  Connect Wallet
+              <div className="pt-4 mt-4 border-t border-white/10 flex flex-col">
+                <Button
+                  size="sm"
+                  className="bg-quantum-red text-white hover:bg-red-700 font-medium border border-transparent"
+                  onClick={() => {
+                    nav("/login");
+                  }}
+                >
+                  Login
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-transparent  text-gray-400 hover:text-white font-medium border border-transparent"
+                  onClick={() => {
+                    nav("/signup");
+                  }}
+                >
+                  Get Started
+                  <ArrowRight />
                 </Button>
               </div>
             </div>

@@ -119,7 +119,7 @@ export const MarketOverview = () => {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
           <div>
-            <h2 className="text-3xl font-semibold text-quantum-red text-left tracking-tight">
+            <h2 className="text-4xl font-semibold text-quantum-red text-left tracking-tight">
               Live Market Intelligence
             </h2>
             <div className="flex items-center gap-2 mt-2">

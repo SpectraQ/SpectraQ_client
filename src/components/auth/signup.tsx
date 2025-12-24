@@ -407,7 +407,7 @@ const SignupForm = () => {
             Existing identity found?{" "}
             <Link
               to="/login"
-              className="text-white hover:underline decoration-white/30 underline-offset-4"
+              className="text-quantum-red hover:underline decoration-white/30 underline-offset-4"
             >
               Authenticate Here
             </Link>

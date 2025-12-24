@@ -16,6 +16,7 @@ interface AuthState {
   loading: boolean;
   error: string | null;
   message: string | null;
+  validatingResetToken: boolean;
 }
 
 const initialState: AuthState = {
@@ -24,6 +25,7 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   message: null,
+  validatingResetToken: false,
 };
 
 // Register
@@ -194,6 +196,11 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    clearAuthState: (state) => {
+      state.loading = false;
+      state.error = null;
+      state.message = null;
+    },
     logout(state) {
       state.user = null;
       state.token = null;
@@ -351,17 +358,17 @@ const authSlice = createSlice({
         state.error = action.payload || "Forgot password failed";
       })
 
-      // validateResetToken
       .addCase(validateResetToken.pending, (state) => {
-        state.loading = true;
+        state.validatingResetToken = true;
         state.error = null;
+        state.message = null;
       })
       .addCase(validateResetToken.fulfilled, (state, action) => {
-        state.loading = false;
-        state.message = action.payload?.message || "Token valid";
+        state.validatingResetToken = false;
+        state.message = action.payload.message;
       })
       .addCase(validateResetToken.rejected, (state, action) => {
-        state.loading = false;
+        state.validatingResetToken = false;
         state.error = action.payload || "Reset token invalid";
       })
 
@@ -411,7 +418,12 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearError, clearMessage, setUserAndToken } =
-  authSlice.actions;
+export const {
+  logout,
+  clearError,
+  clearMessage,
+  setUserAndToken,
+  clearAuthState,
+} = authSlice.actions;
 
 export default authSlice.reducer;

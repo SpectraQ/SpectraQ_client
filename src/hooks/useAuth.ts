@@ -23,7 +23,7 @@ import { setAuthToken } from "../store/api/axiosConfig";
 export function useAuth() {
   const dispatch = useDispatch<AppDispatch>();
 
-  const { user, token, loading, error, message } = useSelector(
+  const { user, token, loading, error, message, validatingResetToken } = useSelector(
     (state: RootState) => state.auth
   );
 
@@ -159,6 +159,7 @@ export function useAuth() {
     loading,
     error,
     message,
+    validatingResetToken,
     isAuthenticated,
 
     // actions

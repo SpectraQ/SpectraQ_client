@@ -240,7 +240,7 @@ const ForgotPasswordForm = () => {
               Remembered your credentials?{" "}
               <span
                 onClick={() => navigate("/login")}
-                className="text-white hover:underline decoration-white/30 underline-offset-4 cursor-pointer"
+                className="text-quantum-red hover:underline decoration-white/30 underline-offset-4 cursor-pointer"
               >
                 Return to Login
               </span>
